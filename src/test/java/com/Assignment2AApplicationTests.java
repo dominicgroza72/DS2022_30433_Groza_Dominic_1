@@ -1,10 +1,10 @@
-package com.example.ds2022_30433_groza_dominic_1;
+package com;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Ds202230433GrozaDominic1ApplicationTests {
+class Assignment2AApplicationTests {
 
     @Test
     void contextLoads() {
