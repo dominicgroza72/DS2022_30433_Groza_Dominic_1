@@ -1,0 +1,58 @@
+version: "3.8"
+
+networks:
+  test-net:
+    external: true
+
+services:
+  mysql:
+    image: 'mysql:8.0'
+    env_file: ./.env
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: $DB_DATABASE
+      MYSQL_USER: $DB_USERNAME
+      MYSQL_PASSWORD: $DB_PASSWORD
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      test-net:
+        ipv4_address: 172.30.0.10
+  app:
+    depends_on:
+      - mysql
+    build: ./
+    restart: on-failure
+    env_file: ./.env
+    ports:
+      - 6868:8090
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:mysql://mysql:$MYSQLDB_DOCKER_PORT/$DB_DATABASE?autoReconnect=true&useSSL=false",
+        "spring.datasource.username" : "$DB_USERNAME",
+        "spring.datasource.password" : "$DB_PASSWORD",
+        "spring.jpa.database-platform" : "org.hibernate.dialect.MySQL5InnoDBDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update"
+      }'
+    networks:
+      test-net:
+        ipv4_address: 172.30.0.20
+
+  front:
+    build: ./frontend
+    image: 'frontend'
+    env_file: ./.env
+    container_name: frontend
+    ports:
+      - 80:80
+    networks:
+      - test-net
+
+volumes:
+  db:
+
+
