@@ -4,21 +4,21 @@
       Users
       <v-spacer></v-spacer>
       <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        label="Search"
-        single-line
-        hide-details
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Search"
+          single-line
+          hide-details
       ></v-text-field>
-      <v-btn @click="addUser">Add User</v-btn>
+      <v-btn v-if="isAdminUser()" @click="addUser">Add User</v-btn>
     </v-card-title>
-    <v-data-table
-      :headers="headers"
-      :items="users"
-      :search="search"
-      @click:row="editUser"
+    <v-data-table v-if="isAdminUser()"
+        :headers="headers"
+        :items="users"
+        :search="search"
+        @click:row="editUser"
     ></v-data-table>
-    <DeviceList></DeviceList>
+    <DeviceList v-if="isAdminUser()"></DeviceList>
     <UserDialog
         :opened="dialogVisible"
         :user="selectedUser"
@@ -32,9 +32,11 @@ import api from "../api";
 import UserDialog from "@/components/UserDialog";
 import DeviceList from "@/views/DeviceList";
 
+let user;
+
 export default {
   name: "UserList",
-  components:{DeviceList, UserDialog},
+  components: {DeviceList, UserDialog},
   data() {
     return {
       users: [],
@@ -46,15 +48,16 @@ export default {
           sortable: false,
           value: "name",
         },
-        { text: "Email", value: "email" },
-        { text: "Roles", value: "roles" },
+        {text: "Email", value: "email"},
+        {text: "Roles", value: "roles"},
       ],
       dialogVisible: false,
-      selectedUser:{},
+      selectedUser: {},
     };
   },
   methods: {
     editUser(user) {
+
       this.selectedUser = user;
       this.dialogVisible = true;
     },
@@ -62,11 +65,18 @@ export default {
       this.dialogVisible = true;
     },
     async refreshList() {
-      this.dialogVisible = false;
-      this.selectedUser = {};
-      this.users = await api.users.allUsers();
+      user = JSON.parse(localStorage.getItem("user"));
+      if (this.isAdminUser()) {
+        this.dialogVisible = false;
+        this.selectedUser = {};
+        this.users = await api.users.allUsers();
+      }
+    },
+    isAdminUser() {
+      return user.roles[0] === "ADMIN"
     },
   },
+
   created() {
     this.refreshList();
   },

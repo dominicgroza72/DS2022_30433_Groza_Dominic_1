@@ -18,7 +18,7 @@
         :search="search"
     >
       <template v-slot:item="row">
-        <tr v-if="checkCondition()" v-on:click="editDevice(row.item)">
+        <tr v-if="checkCondition(row.item.userId)" v-on:click="editDevice(row.item)">
           <td>{{ row.item.title }}</td>
           <td>{{ row.item.description }}</td>
           <td>{{ row.item.max_consumption }}</td>
@@ -37,10 +37,11 @@
 </template>
 
 <script>
-import api from "../api";
+import devices from "../api/services/devices";
+import users from "../api/services/users";
 import DeviceDialog from "@/components/DeviceDialog";
 
-const user = JSON.parse(localStorage.getItem("user"));
+let user = JSON.parse(localStorage.getItem("user"));
 
 export default {
   name: "DeviceList",
@@ -72,15 +73,17 @@ export default {
       this.dialogVisible = true;
     },
     async refreshList() {
+      user = JSON.parse(localStorage.getItem("user"));
+      this.loggedUser = user;
       this.dialogVisible = false;
       this.selectedDevice = {};
-      this.items = await api.devices.allDevices();
-console.log("items" ,this.items);
-      let apiUsers = await api.users.allUsers();
-      for(let i=0;i<apiUsers.length;i++){
-        let interm={
-          text:apiUsers[i].name,
-          value:apiUsers[i].id
+      this.items = await devices.allDevices();
+      console.log(this.items);
+      let apiUsers = await users.allUsers();
+      for (let i = 0; i < apiUsers.length; i++) {
+        let interm = {
+          text: apiUsers[i].name,
+          value: apiUsers[i].id
         }
         this.allUsers.push(interm);
       }
@@ -89,6 +92,7 @@ console.log("items" ,this.items);
       return user.roles[0] === "ADMIN"
     },
     checkCondition(rowUserId) {
+      console.log("user id", rowUserId,user.id);
       if (user.roles[0] === "ADMIN") {
         return true;
       } else {
