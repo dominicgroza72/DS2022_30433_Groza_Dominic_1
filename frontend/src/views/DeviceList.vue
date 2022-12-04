@@ -23,6 +23,7 @@
           <td>{{ row.item.description }}</td>
           <td>{{ row.item.max_consumption }}</td>
           <td>{{ row.item.location }}</td>
+          <v-btn small color="green" v-on:click="deviceMeasurements(row.item)">See energy Consumption</v-btn>
         </tr>
 
       </template>
@@ -33,6 +34,10 @@
         :users="allUsers"
         @refresh="refreshList"
     ></DeviceDialog>
+    <MeasurementDialog
+        :opened="measurementDialogVisible"
+        :deviceId="selectedDeviceId">
+    </MeasurementDialog>
   </v-card>
 </template>
 
@@ -40,12 +45,15 @@
 import devices from "../api/services/devices";
 import users from "../api/services/users";
 import DeviceDialog from "@/components/DeviceDialog";
+import MeasurementDialog from "@/components/MeasurementDialog";
+import SockJS from "sockjs-client";
+import Stomp from "webstomp-client";
 
 let user = JSON.parse(localStorage.getItem("user"));
 
 export default {
   name: "DeviceList",
-  components: {DeviceDialog},
+  components: {MeasurementDialog, DeviceDialog},
   data() {
     return {
       items: [],
@@ -57,9 +65,13 @@ export default {
         {text: "Location", value: "location"},
       ],
       dialogVisible: false,
+      measurementDialogVisible: false,
       selectedDevice: {},
+      selectedDeviceId: 1,
       allUsers: [],
       loggedUser: user,
+      received_messages: [],
+      connected: false
     };
   },
   methods: {
@@ -92,16 +104,39 @@ export default {
       return user.roles[0] === "ADMIN"
     },
     checkCondition(rowUserId) {
-      console.log("user id", rowUserId,user.id);
+      console.log("user id", rowUserId, user.id);
       if (user.roles[0] === "ADMIN") {
         return true;
       } else {
         return rowUserId === user.id
       }
+    },
+    deviceMeasurements(device) {
+      this.selectedDeviceId = device.id;
+      this.measurementDialogVisible = true;
+    },
+    connect() {
+      this.socket = new SockJS("http://localhost:8090/api/websocket");
+      this.stompClient = Stomp.over(this.socket);
+      this.stompClient.connect(
+          {},
+          frame => {
+            this.connected = true;
+            this.stompClient.subscribe("/topic/greetings", tick => {
+              console.log("tick, ", tick);
+              this.received_messages.push(tick);
+            });
+          },
+          error => {
+            console.log("error " + error);
+            this.connected = false;
+          }
+      )
     }
   },
   created() {
     this.refreshList();
+    this.connect();
   },
 };
 </script>

@@ -40,7 +40,7 @@ public class Device {
     @OnDelete(action= OnDeleteAction.CASCADE)
     private User user;
 
-    @OneToMany(mappedBy = "device")
+    @OneToMany(mappedBy = "device",fetch = FetchType.EAGER)
     private Set<Measurement> measurements;
 
 

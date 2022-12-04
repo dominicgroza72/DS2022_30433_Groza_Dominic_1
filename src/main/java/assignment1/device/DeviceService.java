@@ -25,7 +25,7 @@ public class DeviceService {
 
     private Device findById(Long id) {
         return deviceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found" + id));
+                .orElseThrow(() -> new EntityNotFoundException("Device not found" + id));
     }
 
     public List<DeviceDto> findAll() {

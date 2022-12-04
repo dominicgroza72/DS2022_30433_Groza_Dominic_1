@@ -28,7 +28,7 @@ public class Measurement {
     private Float reading_value;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE)
     @JoinColumn(name = "device_id",nullable = true)
     @OnDelete(action= OnDeleteAction.CASCADE)
     private Device device;
