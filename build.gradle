@@ -2,12 +2,25 @@ plugins {
     id 'org.springframework.boot' version '2.6.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id "com.microsoft.azure.azurewebapp" version "1.1.0"
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+azurewebapp {
+    subscription = 'f0e8fdfd-e918-4c43-a574-735fc0635a5f'
+    resourceGroup = 'dominicGroza30433'
+    appName = 'assignment1'
+    pricingTier = 'P1v2'
+    region = 'westus'
+    runtime {
+        os = 'Linux'
+        webContainer = 'Tomcat 9.0'
+        javaVersion = 'Java 8'
+    }
+}
 configurations {
     compileOnly {
         extendsFrom annotationProcessor

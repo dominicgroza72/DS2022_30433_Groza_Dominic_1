@@ -78,14 +78,14 @@ public class Bootstrapper implements ApplicationListener<ApplicationReadyEvent> 
                     deviceRepository.save(device);
                 }
 
-                for (int i = 0; i < 5; i++) {
-                    Random rand = new Random();
-                    Measurement measurement = Measurement.builder()
-                            .date(Timestamp.from(Instant.now()))
-                            .reading_value(rand.nextFloat(1000))
-                            .build();
-                    measurementRepository.save(measurement);
-                }
+//                for (int i = 0; i < 5; i++) {
+//                    Random rand = new Random();
+//                    Measurement measurement = Measurement.builder()
+//                            .date(Timestamp.from(Instant.now()))
+//                            .reading_value(rand.nextFloat(1000))
+//                            .build();
+//                    measurementRepository.save(measurement);
+//                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
