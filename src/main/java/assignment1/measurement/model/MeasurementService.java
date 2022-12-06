@@ -81,7 +81,7 @@ public class MeasurementService {
             if (isMeasurementFromToday(measurement.getDate())) {
                 totalMeasurements += measurement.getReading_value();
                 if (totalMeasurements > maxConsumption) {
-
+                    System.out.println("Limit reached for device "+device.getLocation());
                     notificationController.notification("Limit reached for device " + device.getTitle(), device.getUserId());
                     break;
                 }
