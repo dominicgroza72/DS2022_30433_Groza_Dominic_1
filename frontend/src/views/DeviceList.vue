@@ -28,6 +28,16 @@
 
       </template>
     </v-data-table>
+    <v-data-table
+        :headers="headers1"
+        :items="received_messages">
+      <template v-slot:item="row">
+        <tr>
+          <td>{{ row.item }}</td>
+        </tr>
+
+      </template>
+    </v-data-table>
     <DeviceDialog
         :opened="dialogVisible"
         :device="selectedDevice"
@@ -63,6 +73,9 @@ export default {
         {text: "Description", value: "description"},
         {text: "Maximum consumption (W)", value: "max_consumption"},
         {text: "Location", value: "location"},
+      ],
+      headers1: [
+        {text: "Message", value: "message"}
       ],
       dialogVisible: false,
       measurementDialogVisible: false,
@@ -122,9 +135,8 @@ export default {
           {},
           frame => {
             this.connected = true;
-            this.stompClient.subscribe("/topic/greetings", tick => {
-              console.log("tick, ", tick);
-              this.received_messages.push(tick);
+            this.stompClient.subscribe("/topic/greetings/" + this.loggedUser.id, tick => {
+              this.received_messages.push(tick.body);
             });
           },
           error => {

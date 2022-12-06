@@ -24,9 +24,9 @@ public class UserService {
     private final UserMapper userMapper;
     private final AuthService authService;
 
-    private User findById(Long id) {
+    public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found" + id));
+                .orElseThrow(() -> new EntityNotFoundException("User not found" + id));
     }
 
     public ResponseEntity<MessageResponse> create(UserListDto user) {

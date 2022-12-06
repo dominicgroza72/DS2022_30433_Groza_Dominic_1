@@ -5,6 +5,9 @@ import assignment1.device.model.dto.DeviceDto;
 import assignment1.measurement.MeasurementMapper;
 import assignment1.measurement.MeasurementRepository;
 import assignment1.measurement.model.dto.MeasurementDto;
+import assignment1.user.UserService;
+import assignment1.user.dto.UserListDto;
+import assignment1.user.model.User;
 import assignment1.websocket.NotificationController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,7 @@ public class MeasurementService {
 
     private final DeviceService deviceService;
 
+    private final UserService userService;
 
     private final NotificationController notificationController;
 
@@ -65,20 +69,21 @@ public class MeasurementService {
 
     public void checkMeasurementLimitForDevice(MeasurementDto measurementDto) throws Exception {
         DeviceDto device = deviceService.get(measurementDto.getDeviceId());
+        User user = userService.findById(device.getUserId());
         Long maxConsumption = device.getMax_consumption();
 
         Date formattedDate = new Date(measurementDto.getDate().getTime());
         List<Measurement> allMeasurementsForDayAndDevice = measurementRepository.getMeasurementsForDeviceAndDay(measurementDto.getDeviceId(), formattedDate);
 
-        System.out.println(allMeasurementsForDayAndDevice.get(0).getDevice().getId());
 
         float totalMeasurements = 0;
         for (Measurement measurement : allMeasurementsForDayAndDevice) {
             if (isMeasurementFromToday(measurement.getDate())) {
                 totalMeasurements += measurement.getReading_value();
                 if (totalMeasurements > maxConsumption) {
-                    notificationController.notification("Limit reached for device "+device.getTitle());
-                    System.out.println("greater"+ totalMeasurements+ maxConsumption);
+
+                    notificationController.notification("Limit reached for device " + device.getTitle(), device.getUserId());
+                    break;
                 }
             }
         }
