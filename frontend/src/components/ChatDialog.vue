@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     initSocket() {
-      this.socket = new SockJS('ws://localhost:8090/app/websocket');
+      this.socket = new SockJS('http://localhost:8090/app/websocket');
       this.privateStompClient = Stomp.over(this.socket);
       var stompClient = this.privateStompClient;
       this.privateStompClient.connect({}, function (frame) {
@@ -45,8 +45,8 @@ export default {
     sendPrivateMessage() {
       const text = document.getElementById('privateText').value;
       const to = document.getElementById('to').value;
-      const msg = {'toUsername': to, 'message': text};
-      this.privateStompClient.send("/app/private",  JSON.stringify(msg),{}
+      const msg = {toUsername: "eu", message: "tu"};
+      this.privateStompClient.send("/app/private", {}, JSON.stringify(msg)
 
       );
     },

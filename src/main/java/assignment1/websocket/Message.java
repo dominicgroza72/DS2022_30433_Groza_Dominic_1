@@ -10,16 +10,9 @@ import lombok.*;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "toUsername",
-        "message",
 
-})
 public class Message {
-    @JsonProperty("toUsername")
     public String toUsername;
 
-    @JsonProperty("message")
     public String message;
 }
