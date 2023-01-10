@@ -48,6 +48,7 @@
         :opened="measurementDialogVisible"
         :deviceId="selectedDeviceId">
     </MeasurementDialog>
+    <ChatDialog></ChatDialog>
   </v-card>
 </template>
 
@@ -58,12 +59,13 @@ import DeviceDialog from "@/components/DeviceDialog";
 import MeasurementDialog from "@/components/MeasurementDialog";
 import SockJS from "sockjs-client";
 import Stomp from "webstomp-client";
+import ChatDialog from "@/components/ChatDialog";
 
 let user = JSON.parse(localStorage.getItem("user"));
 
 export default {
   name: "DeviceList",
-  components: {MeasurementDialog, DeviceDialog},
+  components: {ChatDialog, MeasurementDialog, DeviceDialog},
   data() {
     return {
       items: [],
@@ -129,21 +131,21 @@ export default {
       this.measurementDialogVisible = true;
     },
     connect() {
-      this.socket = new SockJS("http://localhost:8090/api/websocket");
-      this.stompClient = Stomp.over(this.socket);
-      this.stompClient.connect(
-          {},
-          frame => {
-            this.connected = true;
-            this.stompClient.subscribe("/topic/greetings/" + this.loggedUser.id, tick => {
-              this.received_messages.push(tick.body);
-            });
-          },
-          error => {
-            console.log("error " + error);
-            this.connected = false;
-          }
-      )
+      // this.socket = new SockJS("http://localhost:8090/app/websocket");
+      // this.stompClient = Stomp.over(this.socket);
+      // this.stompClient.connect(
+      //     {},
+      //     frame => {
+      //       this.connected = true;
+      //       this.stompClient.subscribe("/topic/greetings/" + this.loggedUser.id, tick => {
+      //         this.received_messages.push(tick.body);
+      //       });
+      //     },
+      //     error => {
+      //       console.log("error " + error);
+      //       this.connected = false;
+      //     }
+      // )
     }
   },
   created() {

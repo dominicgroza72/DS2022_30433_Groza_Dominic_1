@@ -53,7 +53,7 @@ dependencies {
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     implementation group: 'org.springframework', name: 'spring-websocket'
     implementation group: 'org.springframework', name: 'spring-messaging'
-
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'
 
 }
 
