@@ -12,7 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 
 public class Message {
-    public String toUsername;
-
     public String message;
+    public String fromUsername;
 }

@@ -5,6 +5,8 @@ public class UrlMapping {
     public static final String DEVICES = API_PATH + "/devices";
     public static final String MEASUREMENTS = API_PATH + "/measurements";
     public static final String ENTITY = "/{id}";
+    public static final String TOUSERNAME = "/{toUsername}";
+
     public static final String FILTERED = "/filtered";
     public static final String AUTH = API_PATH + "/auth";
     public static final String SIGN_IN = "/sign-in";

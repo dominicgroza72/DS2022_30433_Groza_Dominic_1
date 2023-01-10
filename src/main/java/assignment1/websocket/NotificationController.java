@@ -11,7 +11,7 @@ public class NotificationController {
     @Autowired
     SimpMessagingTemplate messagingTemplate;
 
-    public void notification(String message,Long userId) throws Exception{
+    public void notification(Message message,Long userId) throws Exception{
         Thread.sleep(1000);
         messagingTemplate.convertAndSend("/topic/greetings/"+userId,message);
     }

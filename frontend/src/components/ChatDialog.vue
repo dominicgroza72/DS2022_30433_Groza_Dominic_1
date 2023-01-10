@@ -1,64 +1,42 @@
 <template>
-  <div>
-
-    <br/>
-    <div>
-      <button id="sendPrivateMessage" v-on:click="sendPrivateMessage();">Send Private</button>
-      <input type="text" id="privateText" placeholder="Private Message"/>
-      <input type="text" id="to" placeholder="To"/>
-    </div>
-    <br/>
-    <br/>
-    <br/>
-
-    <div id="messages"></div>
-
-  </div>
+  <v-card class="d-flex flex-column">
+    <v-card-title>
+      Chat
+    </v-card-title>
+    <v-text-field v-model="messageText" label="Message"/>
+    <v-text-field v-model="messageTo" label="To"/>
+    <v-spacer></v-spacer>
+    <v-card-actions>
+      <div style="width: 75%!important;"></div>
+      <v-btn @click="sendPrivateMessage" color="blue">Send Message</v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
-import SockJS from "sockjs-client";
-import Stomp from "webstomp-client";
+import users from "../api/services/users";
+
+let user = JSON.parse(localStorage.getItem("user"));
 
 export default {
   name: "ChatDialog",
   data() {
     return {
-      privateStompClient: null,
-      socket: null
+      messageText: '',
+      messageTo: '',
+      loggedUser: null,
     }
   },
   methods: {
-    initSocket() {
-      this.socket = new SockJS('http://localhost:8090/app/websocket');
-      this.privateStompClient = Stomp.over(this.socket);
-      var stompClient = this.privateStompClient;
-      this.privateStompClient.connect({}, function (frame) {
-        console.log(frame);
-        stompClient.subscribe('/user/specific', function (result) {
-          console.log("O INTRAT CEVA", result.body)
-
-          this.show(JSON.parse(result.body));
-        });
-      });
-    },
     sendPrivateMessage() {
-      const text = document.getElementById('privateText').value;
-      const to = document.getElementById('to').value;
-      const msg = {toUsername: "eu", message: "tu"};
-      this.privateStompClient.send("/app/private", {}, JSON.stringify(msg)
-
-      );
+      const msg = {message: this.messageText, fromUsername: user.username};
+      users.sendMessage(this.messageTo, msg);
+      this.$emit('sentMessage',{message:this.messageText,fromUsername: 'YOU'})
     },
-    show(message) {
-      const response = document.getElementById('messages');
-      const p = document.createElement('p');
-      p.innerHTML = "message: " + message.text;
-      response.appendChild(p);
-    }
   },
-  mounted() {
-    this.initSocket();
+  created() {
+    user = JSON.parse(localStorage.getItem("user"));
+    this.loggedUser = user;
   }
 }
 </script>

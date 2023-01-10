@@ -26,20 +26,9 @@ public class ChatController {
         return message;
     }
 
-    @MessageMapping("/private")
-    public void sendToSpecificUser(@Payload byte[] message) {
-        String s = new String(message, StandardCharsets.UTF_8);
-        System.out.println(s);
-//        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(message);
-//             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+//    @MessageMapping("/private")
+//    public void sendToSpecificUser(@Payload Message message) {
 //
-//            // Read the object from the byte array
-//            Message message1 = (Message) objectInputStream.readObject();
-//            System.out.println(message1.getMessage()+" ---- ");
-//
-//        } catch (IOException | ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        simpMessagingTemplate.convertAndSendToUser(message.getToUsername(), "/specific", message);
-    }
+//        simpMessagingTemplate.convertAndSendToUser(message.getToUsername(), "/app/specific", message);
+//    }
 }

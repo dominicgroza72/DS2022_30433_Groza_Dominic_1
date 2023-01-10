@@ -8,6 +8,7 @@ import assignment1.measurement.model.dto.MeasurementDto;
 import assignment1.user.UserService;
 import assignment1.user.dto.UserListDto;
 import assignment1.user.model.User;
+import assignment1.websocket.Message;
 import assignment1.websocket.NotificationController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +83,11 @@ public class MeasurementService {
                 totalMeasurements += measurement.getReading_value();
                 if (totalMeasurements > maxConsumption) {
                     System.out.println("Limit reached for device "+device.getLocation());
-                    notificationController.notification("Limit reached for device " + device.getTitle(), device.getUserId());
+                    Message message= Message.builder()
+                            .message("Limit reached for device " + device.getTitle())
+                            .fromUsername("System administrator")
+                            .build();
+                    notificationController.notification(message, device.getUserId());
                     break;
                 }
             }

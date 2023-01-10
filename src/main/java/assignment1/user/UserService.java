@@ -7,6 +7,8 @@ import assignment1.user.dto.UserListDto;
 import assignment1.user.dto.UserMinimalDto;
 import assignment1.user.mapper.UserMapper;
 import assignment1.user.model.User;
+import assignment1.websocket.Message;
+import assignment1.websocket.NotificationController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,9 +26,15 @@ public class UserService {
     private final UserMapper userMapper;
     private final AuthService authService;
 
+    private final NotificationController notificationController;
+
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found" + id));
+    }
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found" + username));
     }
 
     public ResponseEntity<MessageResponse> create(UserListDto user) {
@@ -75,5 +83,11 @@ public class UserService {
         userToUpdate.setPassword(user.getPassword());
         userToUpdate.setUsername(user.getName());
         return userMapper.userListDtoFromUser(userRepository.save(userToUpdate));
+    }
+
+    public void sendMessage(String username, Message message) throws Exception {
+        User userToSendTo=findByUsername(username);
+        notificationController.notification(message, userToSendTo.getId());
+
     }
 }

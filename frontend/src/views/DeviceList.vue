@@ -1,55 +1,65 @@
 <template>
-  <v-card>
-    <v-card-title>
-      Devices
-      <v-spacer></v-spacer>
-      <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-      ></v-text-field>
-      <v-btn v-if="isAdminUser()" @click="addDevice">Add Device</v-btn>
-    </v-card-title>
-    <v-data-table
-        :headers="headers"
-        :items="items"
-        :search="search"
-    >
-      <template v-slot:item="row">
-        <tr v-if="checkCondition(row.item.userId)" v-on:click="editDevice(row.item)">
-          <td>{{ row.item.title }}</td>
-          <td>{{ row.item.description }}</td>
-          <td>{{ row.item.max_consumption }}</td>
-          <td>{{ row.item.location }}</td>
-          <v-btn small color="green" v-on:click="deviceMeasurements(row.item)">See energy Consumption</v-btn>
-        </tr>
+  <div>
+    <v-card>
+      <v-card-title>
+        Devices
+        <v-spacer></v-spacer>
+        <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+        ></v-text-field>
+        <v-btn v-if="isAdminUser()" @click="addDevice">Add Device</v-btn>
+      </v-card-title>
+      <v-data-table
+          :headers="headers"
+          :items="items"
+          :search="search"
+      >
+        <template v-slot:item="row">
+          <tr v-if="checkCondition(row.item.userId)" v-on:click="editDevice(row.item)">
+            <td>{{ row.item.title }}</td>
+            <td>{{ row.item.description }}</td>
+            <td>{{ row.item.max_consumption }}</td>
+            <td>{{ row.item.location }}</td>
+            <v-btn small color="green" v-on:click="deviceMeasurements(row.item)">See energy Consumption</v-btn>
+          </tr>
 
-      </template>
-    </v-data-table>
-    <v-data-table
-        :headers="headers1"
-        :items="received_messages">
-      <template v-slot:item="row">
-        <tr>
-          <td>{{ row.item }}</td>
-        </tr>
-
-      </template>
-    </v-data-table>
-    <DeviceDialog
-        :opened="dialogVisible"
-        :device="selectedDevice"
-        :users="allUsers"
-        @refresh="refreshList"
-    ></DeviceDialog>
-    <MeasurementDialog
-        :opened="measurementDialogVisible"
-        :deviceId="selectedDeviceId">
-    </MeasurementDialog>
-    <ChatDialog></ChatDialog>
-  </v-card>
+        </template>
+      </v-data-table>
+    </v-card>
+    <v-card>
+      <v-card-title>
+        Messages
+      </v-card-title>
+      <v-data-table
+          :headers="headers1"
+          :items="received_messages">
+        <template v-slot:item="row">
+          <tr>
+            <td>{{ row.item.fromUsername }}</td>
+            <td>{{ row.item.message }}</td>
+          </tr>
+        </template>
+      </v-data-table>
+    </v-card>
+    <v-card>
+      <DeviceDialog
+          :opened="dialogVisible"
+          :device="selectedDevice"
+          :users="allUsers"
+          @refresh="refreshList"
+      ></DeviceDialog>
+      <MeasurementDialog
+          :opened="measurementDialogVisible"
+          :deviceId="selectedDeviceId">
+      </MeasurementDialog>
+      <ChatDialog
+          @sentMessage="(message) => this.received_messages.push(message)"></ChatDialog>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -77,7 +87,9 @@ export default {
         {text: "Location", value: "location"},
       ],
       headers1: [
-        {text: "Message", value: "message"}
+        {text: "From", value: "from"},
+        {text: "Message", value: "message"},
+
       ],
       dialogVisible: false,
       measurementDialogVisible: false,
@@ -106,6 +118,7 @@ export default {
       this.selectedDevice = {};
       this.items = await devices.allDevices();
       console.log(this.items);
+      console.log(this.loggedUser);
       let apiUsers = await users.allUsers();
       for (let i = 0; i < apiUsers.length; i++) {
         let interm = {
@@ -131,21 +144,21 @@ export default {
       this.measurementDialogVisible = true;
     },
     connect() {
-      // this.socket = new SockJS("http://localhost:8090/app/websocket");
-      // this.stompClient = Stomp.over(this.socket);
-      // this.stompClient.connect(
-      //     {},
-      //     frame => {
-      //       this.connected = true;
-      //       this.stompClient.subscribe("/topic/greetings/" + this.loggedUser.id, tick => {
-      //         this.received_messages.push(tick.body);
-      //       });
-      //     },
-      //     error => {
-      //       console.log("error " + error);
-      //       this.connected = false;
-      //     }
-      // )
+      this.socket = new SockJS("http://localhost:8090/app/websocket");
+      this.stompClient = Stomp.over(this.socket);
+      this.stompClient.connect(
+          {},
+          frame => {
+            this.connected = true;
+            this.stompClient.subscribe("/topic/greetings/" + this.loggedUser.id, tick => {
+              this.received_messages.push(JSON.parse(tick.body));
+            });
+          },
+          error => {
+            console.log("error " + error);
+            this.connected = false;
+          }
+      )
     }
   },
   created() {
